@@ -2,148 +2,287 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>HI-TECH Service Software - Print Fixed</title>
+    <title>HI-TECH Service Pro - Final Edition</title>
+    <script src="https://cloudflare.com"></script>
     <style>
-        :root { --primary: #2c3e50; }
-        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
-        .no-print { max-width: 900px; margin: auto; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        :root { --primary: #2c3e50; --accent: #3498db; }
+        body { font-family: 'Segoe UI', Arial; background: #f0f2f5; margin: 0; padding: 20px; }
+        .no-print { max-width: 1100px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 5px solid var(--primary); }
         
-        /* Branding CSS */
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
+        input, textarea, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%; box-sizing: border-box; font-size: 14px; }
+        
+        /* Checkbox Alignment Fix */
+        .check-section { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; margin: 15px 0; }
+        .check-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .check-grid label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; }
+        .check-grid input { width: 18px; height: 18px; cursor: pointer; }
+
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+        .btn-save { background: #27ae60; }
+        .btn-print { background: var(--primary); }
+        .btn-reset { background: #95a5a6; }
+
+        /* A4 Layout Perfect Match */
         #a4-report { 
             width: 210mm; min-height: 297mm; padding: 15mm; background: white; 
-            margin: 20px auto; border: 1px solid #000; box-sizing: border-box; position: relative; 
+            margin: 20px auto; border: 1px solid #000; box-sizing: border-box; position: relative; display: none;
         }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .a4-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; align-items: center; }
+        .logo-img { max-height: 80px; max-width: 160px; object-fit: contain; }
+        .stamp-img { position: absolute; bottom: 120px; right: 70px; width: 140px; opacity: 0.8; z-index: 99; }
+        .a4-title { text-align: center; font-size: 22px; font-weight: bold; border: 1px solid #000; margin: 15px 0; padding: 5px; background: #f2f2f2; }
         
-        /* IMPORTANT: Image visibility fix */
-        .logo-img, .stamp-img { display: block !important; opacity: 1 !important; visibility: visible !important; }
-        .logo-img { max-height: 80px; max-width: 150px; }
-        .stamp-img { position: absolute; bottom: 100px; right: 50px; width: 140px; z-index: 999; }
+        .info-table { border: 1px solid #000; display: flex; margin-bottom: 15px; }
+        .info-l { flex: 2; padding: 10px; border-right: 1px solid #000; line-height: 1.8; }
+        .info-r { flex: 1; padding: 10px; line-height: 1.8; }
+        
+        table.work-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        table.work-table th, table.work-table td { border: 1px solid #000; padding: 10px; text-align: left; }
+        .comp-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 12px; margin: 10px 0; }
 
         @media print {
             .no-print { display: none !important; }
-            #a4-report { border: none; margin: 0; display: block !important; width: 100% !important; }
+            #a4-report { display: block !important; border: none; margin: 0; padding: 10mm; width: 100%; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            img { display: block !important; } /* Force images to show */
         }
-
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        input, textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div class="no-print">
-    <!-- Setup Section -->
-    <div class="card" style="background:#eef7ff; border:1px solid #3498db;">
-        <h3>⚙️ Branding Setup</h3>
-        <div class="grid-3">
+    <!-- 1. BRANDING SETTINGS -->
+    <div class="card" style="background:#eef7ff; border: 2px solid #3498db;">
+        <h3>🏢 Step 1: Branding Setup (Client Branding)</h3>
+        <div class="grid-4">
             <input type="text" id="set_comp" placeholder="Company Name">
-            <input type="text" id="set_phone" placeholder="Phone Number">
+            <input type="text" id="set_phone" placeholder="Phone">
             <input type="text" id="set_addr" placeholder="Address">
-            <div>Logo: <input type="file" id="logo_input" onchange="previewFile('logo_input', 'out_logo')"></div>
-            <div>Stamp: <input type="file" id="stamp_input" onchange="previewFile('stamp_input', 'out_stamp')"></div>
-            <button onclick="saveAll()" style="background:#27ae60; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">SAVE BRANDING ✅</button>
+            <div>Logo: <input type="file" onchange="encodeImg(this, 'out_logo')"></div>
+            <div>Stamp: <input type="file" onchange="encodeImg(this, 'out_stamp')"></div>
+            <button class="btn-save" onclick="saveBranding()">Save Branding ✅</button>
         </div>
     </div>
 
-    <!-- Data Entry -->
+    <!-- 2. DATA ENTRY -->
     <div class="card">
-        <h2>🛠️ Create Report</h2>
-        <div class="grid-3">
-            <input type="text" id="in_name" placeholder="Customer Name" oninput="sync()">
-            <input type="text" id="in_no" placeholder="Report No" oninput="sync()">
+        <h3>📝 Step 2: Create Report</h3>
+        <div class="grid-4">
+            <!-- Party Selection -->
+            <input type="text" id="in_name" list="party_list" placeholder="Customer Name" oninput="sync()">
+            <datalist id="party_list"></datalist>
+            
+            <input type="text" id="in_branch" placeholder="Branch" oninput="sync()">
+            <input type="text" id="in_cust_phone" placeholder="Cust. Phone" oninput="sync()">
+            <input type="text" id="in_no" readonly style="background:#eee; color:red; font-weight:bold;">
             <input type="date" id="in_date" oninput="sync()">
-            <textarea id="in_desc" placeholder="Work Description" class="grid-3" style="grid-column: span 3;" oninput="sync()"></textarea>
+            <input type="text" id="in_model" placeholder="Machine Model" oninput="sync()">
+            <input type="text" id="in_serial" placeholder="Serial Number" oninput="sync()">
+            <input type="number" id="in_qty" placeholder="Qty" value="1" oninput="sync()">
+            <input type="number" id="in_price" placeholder="Price" oninput="sync()">
+            <input type="text" id="in_words" placeholder="Amount in Words" oninput="sync()">
+            <input type="date" id="in_next" oninput="sync()" title="Next Service Date">
         </div>
-        <button onclick="window.print()" style="margin-top:15px; padding:10px 20px; background:#2c3e50; color:white; border:none; border-radius:5px; cursor:pointer;">🖨️ PRINT REPORT</button>
+
+        <div class="check-section">
+            <b>Nature of Complaint:</b>
+            <div class="check-grid" id="comp_form">
+                <label><input type="checkbox" value="Not Turning On" onchange="sync()"> Not Turning On</label>
+                <label><input type="checkbox" value="Error Message" onchange="sync()"> Error Message</label>
+                <label><input type="checkbox" value="Note Jamming" onchange="sync()"> Note Jamming</label>
+                <label><input type="checkbox" value="Fake Detection" onchange="sync()"> Fake Detection</label>
+                <label><input type="checkbox" value="Calibration Error" onchange="sync()"> Calibration Error</label>
+                <label><input type="checkbox" value="Sensor Cleaning" onchange="sync()"> Sensor Cleaning</label>
+            </div>
+        </div>
+
+        <textarea id="in_remarks" placeholder="Work Description / Remarks" rows="3" oninput="sync()"></textarea>
+
+        <div class="btn-group">
+            <button class="btn-save" onclick="saveReport()">💾 Save Report & Party</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Print Report</button>
+            <button class="btn-reset" onclick="location.reload()">🔄 New Bill</button>
+            <button style="background:#f39c12;" onclick="exportToExcel()">📊 Export Excel</button>
+        </div>
+    </div>
+
+    <!-- 3. HISTORY -->
+    <div class="card">
+        <h3>📂 History & Saved Parties</h3>
+        <table style="width:100%; border-collapse:collapse; font-size:13px;" id="hist_table">
+            <thead><tr style="background:#eee;"><th>No</th><th>Customer</th><th>Date</th><th>Amount</th><th>Actions</th></tr></thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 
-<!-- A4 Page Layout -->
+<!-- A4 PRINTABLE AREA -->
 <div id="a4-report">
-    <div class="header">
+    <div class="a4-header">
         <div>
-            <h1 id="out_comp" style="margin:0;">COMPANY NAME</h1>
-            <p id="out_addr">Business Address</p>
-            <p id="out_phone">Phone: 0000000000</p>
+            <h1 id="out_comp" style="margin:0; font-size:28px; color:var(--primary);">COMPANY NAME</h1>
+            <p id="out_addr">Address Line</p>
+            <p id="out_phone_h">📞 0000000000</p>
         </div>
-        <!-- Logo Container -->
-        <div id="logo_container">
-            <img id="out_logo" class="logo-img" src="" alt="">
+        <img id="out_logo" class="logo-img" src="" alt=" ">
+    </div>
+
+    <div class="a4-title">SERVICE REPORT</div>
+
+    <div class="info-table">
+        <div class="info-l">
+            Customer: <b id="out_name"></b><br>
+            Branch: <span id="out_branch"></span><br>
+            Contact: <span id="out_cust_phone"></span>
+        </div>
+        <div class="info-r">
+            No: <b id="out_no" style="color:red;"></b><br>
+            Date: <span id="out_date"></span>
         </div>
     </div>
 
-    <h2 style="text-align:center; border:1px solid #000; padding:5px; background:#f2f2f2; margin:15px 0;">SERVICE REPORT</h2>
+    <p><b>Machine:</b> <span id="out_model"></span> &nbsp; | &nbsp; <b>Serial No:</b> <span id="out_serial"></span></p>
 
-    <div style="border:1px solid #000; padding:10px; line-height:1.6;">
-        Customer: <b id="out_name"></b><br>
-        Report No: <span id="out_no"></span> | Date: <span id="out_date"></span>
-    </div>
+    <div style="font-weight:bold; text-decoration:underline; font-size:14px;">NATURE OF COMPLAINT:</div>
+    <div class="comp-out" id="out_comp_list"></div>
 
-    <table border="1" style="width:100%; border-collapse:collapse; margin-top:20px;">
-        <tr><th style="padding:10px;">Work Description</th></tr>
-        <tr><td id="out_desc" style="height:250px; padding:10px; vertical-align:top; white-space:pre-wrap;"></td></tr>
+    <table class="work-table">
+        <thead><tr><th>Description of Work / Spare Part</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr>
+                <td id="out_remarks" style="height:150px; vertical-align:top; white-space:pre-wrap;"></td>
+                <td id="out_qty" style="vertical-align:top;"></td>
+                <td id="out_price" style="vertical-align:top;"></td>
+                <td id="out_total" style="vertical-align:top; font-weight:bold;"></td>
+            </tr>
+        </tbody>
     </table>
+    
+    <p><b>Amount in Words:</b> <span id="out_words"></span></p>
+    <p><b>Next Service Due Date:</b> <span id="out_next"></span></p>
 
-    <!-- Stamp Image -->
-    <img id="out_stamp" class="stamp-img" src="" alt="">
+    <img id="out_stamp" class="stamp-img" src="" alt=" ">
 
-    <div style="display:flex; justify-content:space-between; margin-top:100px;">
-        <p style="border-top:1px solid #000; width:150px; text-align:center;">Customer Sign</p>
-        <p style="border-top:1px solid #000; width:150px; text-align:center;">Authorized Sign</p>
+    <div style="display:flex; justify-content:space-between; margin-top:80px;">
+        <div style="border-top:1px solid #000; width:180px; text-align:center;">Customer Sign</div>
+        <div style="border-top:1px solid #000; width:180px; text-align:center;">Authorized Sign</div>
     </div>
 </div>
 
 <script>
-    // 1. File to Base64 Function
-    function previewFile(inputId, imgId) {
-        const file = document.getElementById(inputId).files[0];
+    let db = JSON.parse(localStorage.getItem('hte_master_db')) || [];
+    let parties = JSON.parse(localStorage.getItem('hte_parties')) || [];
+
+    window.onload = function() {
+        loadBranding();
+        renderHistory();
+        updatePartyDatalist();
+        let lastNo = db.length > 0 ? Math.max(...db.map(r => parseInt(r.no))) : 0;
+        document.getElementById('in_no').value = (lastNo + 1).toString().padStart(3, '0');
+        document.getElementById('out_no').innerText = document.getElementById('in_no').value;
+    };
+
+    function encodeImg(input, target) {
         const reader = new FileReader();
-        reader.onloadend = function() {
-            document.getElementById(imgId).src = reader.result;
-        }
-        if (file) { reader.readAsDataURL(file); }
+        reader.onload = (e) => document.getElementById(target).src = e.target.result;
+        if(input.files[0]) reader.readAsDataURL(input.files[0]);
     }
 
-    // 2. Save Everything to Storage
-    function saveAll() {
-        const branding = {
-            name: document.getElementById('set_comp').value,
-            phone: document.getElementById('set_phone').value,
+    function saveBranding() {
+        const brand = {
+            comp: document.getElementById('set_comp').value,
             addr: document.getElementById('set_addr').value,
+            phone: document.getElementById('set_phone').value,
             logo: document.getElementById('out_logo').src,
             stamp: document.getElementById('out_stamp').src
         };
-        localStorage.setItem('hte_pro_brand', JSON.stringify(branding));
-        alert("Branding Saved Successfully!");
-        location.reload();
+        localStorage.setItem('hte_brand_final', JSON.stringify(brand));
+        alert("Branding Saved! Ab Report par aapka naam dikhega.");
+        loadBranding();
     }
 
-    // 3. Load on Startup
-    window.onload = function() {
-        const saved = JSON.parse(localStorage.getItem('hte_pro_brand'));
-        if(saved) {
-            document.getElementById('out_comp').innerText = saved.name || 'COMPANY NAME';
-            document.getElementById('out_phone').innerText = "Phone: " + (saved.phone || '0000000000');
-            document.getElementById('out_addr').innerText = saved.addr || 'Address';
-            if(saved.logo) document.getElementById('out_logo').src = saved.logo;
-            if(saved.stamp) document.getElementById('out_stamp').src = saved.stamp;
-            
-            // Fill settings fields
-            document.getElementById('set_comp').value = saved.name || '';
-            document.getElementById('set_phone').value = saved.phone || '';
-            document.getElementById('set_addr').value = saved.addr || '';
+    function loadBranding() {
+        const brand = JSON.parse(localStorage.getItem('hte_brand_final')) || {};
+        if(brand.comp) {
+            document.getElementById('out_comp').innerText = brand.comp;
+            document.getElementById('out_addr').innerText = brand.addr;
+            document.getElementById('out_phone_h').innerText = "📞 " + brand.phone;
+            document.getElementById('out_logo').src = brand.logo;
+            document.getElementById('out_stamp').src = brand.stamp;
+            document.getElementById('set_comp').value = brand.comp;
+            document.getElementById('set_addr').value = brand.addr;
+            document.getElementById('set_phone').value = brand.phone;
         }
     }
 
-    // 4. Data Sync
     function sync() {
-        document.getElementById('out_name').innerText = document.getElementById('in_name').value;
-        document.getElementById('out_no').innerText = document.getElementById('in_no').value;
-        document.getElementById('out_date').innerText = document.getElementById('in_date').value;
-        document.getElementById('out_desc').innerText = document.getElementById('in_desc').value;
+        const fields = ['name', 'branch', 'cust_phone', 'no', 'date', 'model', 'serial', 'qty', 'price', 'words', 'remarks', 'next'];
+        fields.forEach(f => {
+            let val = document.getElementById('in_'+f).value;
+            document.getElementById('out_'+f).innerText = val;
+        });
+        let total = document.getElementById('in_qty').value * document.getElementById('in_price').value;
+        document.getElementById('out_total').innerText = "₹ " + total;
+        
+        let compHtml = '';
+        document.querySelectorAll('#comp_form input').forEach(c => {
+            compHtml += `<div style="display:flex; align-items:center; gap:5px;">${c.checked ? '☑' : '☐'} ${c.value}</div>`;
+        });
+        document.getElementById('out_comp_list').innerHTML = compHtml;
+        document.getElementById('a4-report').style.display = 'block';
+    }
+
+    function saveReport() {
+        const name = document.getElementById('in_name').value;
+        if(!name) return alert("Customer Name jaruri hai!");
+        
+        const report = {
+            no: document.getElementById('in_no').value,
+            name: name,
+            date: document.getElementById('in_date').value,
+            total: document.getElementById('in_qty').value * document.getElementById('in_price').value
+        };
+        db.push(report);
+        localStorage.setItem('hte_master_db', JSON.stringify(db));
+
+        if(!parties.includes(name)) {
+            parties.push(name);
+            localStorage.setItem('hte_parties', JSON.stringify(parties));
+        }
+        alert("Report aur Party save ho gayi!");
+        location.reload();
+    }
+
+    function renderHistory() {
+        const tbody = document.querySelector('#hist_table tbody');
+        tbody.innerHTML = db.map((r, i) => `
+            <tr>
+                <td>${r.no}</td><td>${r.name}</td><td>${r.date}</td><td>₹${r.total}</td>
+                <td><button style="background:red; padding:3px 8px;" onclick="deleteReport(${i})">Del</button></td>
+            </tr>
+        `).reverse().join('');
+    }
+
+    function updatePartyDatalist() {
+        const list = document.getElementById('party_list');
+        list.innerHTML = parties.map(p => `<option value="${p}">`).join('');
+    }
+
+    function deleteReport(i) {
+        if(confirm("Delete karein?")) {
+            db.splice(i, 1);
+            localStorage.setItem('hte_master_db', JSON.stringify(db));
+            renderHistory();
+        }
+    }
+
+    function exportToExcel() {
+        const ws = XLSX.utils.json_to_sheet(db);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Reports");
+        XLSX.writeFile(wb, "HI-TECH_Service_History.xlsx");
     }
 </script>
 
