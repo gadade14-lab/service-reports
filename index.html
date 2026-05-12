@@ -2,60 +2,47 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <title>HI-TECH Service Pro - Final Edition</title>
+    <title>HI-TECH Service Pro - Edit & Print System</title>
     <script src="https://cloudflare.com"></script>
     <style>
         :root { --primary: #2c3e50; --accent: #3498db; }
         body { font-family: 'Segoe UI', Arial; background: #f0f2f5; margin: 0; padding: 20px; }
         .no-print { max-width: 1100px; margin: auto; }
         .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 5px solid var(--primary); }
-        
         .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 15px; }
         input, textarea, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%; box-sizing: border-box; font-size: 14px; }
-        
-        /* Checkbox Alignment Fix */
         .check-section { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; margin: 15px 0; }
         .check-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .check-grid label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; }
-        .check-grid input { width: 18px; height: 18px; cursor: pointer; }
-
-        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
-        button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; }
+        .check-grid label { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
         .btn-save { background: #27ae60; }
+        .btn-update { background: #2980b9; display: none; }
         .btn-print { background: var(--primary); }
-        .btn-reset { background: #95a5a6; }
 
-        /* A4 Layout Perfect Match */
-        #a4-report { 
-            width: 210mm; min-height: 297mm; padding: 15mm; background: white; 
-            margin: 20px auto; border: 1px solid #000; box-sizing: border-box; position: relative; display: none;
-        }
-        .a4-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; align-items: center; }
+        /* A4 Layout */
+        #a4-report { width: 210mm; min-height: 297mm; padding: 15mm; background: white; margin: 20px auto; border: 1px solid #000; box-sizing: border-box; position: relative; display: none; }
+        .a4-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; }
         .logo-img { max-height: 80px; max-width: 160px; object-fit: contain; }
         .stamp-img { position: absolute; bottom: 120px; right: 70px; width: 140px; opacity: 0.8; z-index: 99; }
         .a4-title { text-align: center; font-size: 22px; font-weight: bold; border: 1px solid #000; margin: 15px 0; padding: 5px; background: #f2f2f2; }
-        
         .info-table { border: 1px solid #000; display: flex; margin-bottom: 15px; }
         .info-l { flex: 2; padding: 10px; border-right: 1px solid #000; line-height: 1.8; }
-        .info-r { flex: 1; padding: 10px; line-height: 1.8; }
-        
         table.work-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        table.work-table th, table.work-table td { border: 1px solid #000; padding: 10px; text-align: left; }
-        .comp-out { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 12px; margin: 10px 0; }
+        table.work-table th, table.work-table td { border: 1px solid #000; padding: 10px; }
 
         @media print {
             .no-print { display: none !important; }
-            #a4-report { display: block !important; border: none; margin: 0; padding: 10mm; width: 100%; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            #a4-report { display: block !important; border: none; margin: 0; width: 100%; }
         }
     </style>
 </head>
 <body>
 
 <div class="no-print">
-    <!-- 1. BRANDING SETTINGS -->
+    <!-- BRANDING SETTINGS -->
     <div class="card" style="background:#eef7ff; border: 2px solid #3498db;">
-        <h3>🏢 Step 1: Branding Setup (Client Branding)</h3>
+        <h3>🏢 Step 1: Branding Setup</h3>
         <div class="grid-4">
             <input type="text" id="set_comp" placeholder="Company Name">
             <input type="text" id="set_phone" placeholder="Phone">
@@ -66,14 +53,12 @@
         </div>
     </div>
 
-    <!-- 2. DATA ENTRY -->
+    <!-- DATA ENTRY -->
     <div class="card">
-        <h3>📝 Step 2: Create Report</h3>
+        <h3 id="form_title">📝 Step 2: Create Report</h3>
         <div class="grid-4">
-            <!-- Party Selection -->
             <input type="text" id="in_name" list="party_list" placeholder="Customer Name" oninput="sync()">
             <datalist id="party_list"></datalist>
-            
             <input type="text" id="in_branch" placeholder="Branch" oninput="sync()">
             <input type="text" id="in_cust_phone" placeholder="Cust. Phone" oninput="sync()">
             <input type="text" id="in_no" readonly style="background:#eee; color:red; font-weight:bold;">
@@ -83,7 +68,7 @@
             <input type="number" id="in_qty" placeholder="Qty" value="1" oninput="sync()">
             <input type="number" id="in_price" placeholder="Price" oninput="sync()">
             <input type="text" id="in_words" placeholder="Amount in Words" oninput="sync()">
-            <input type="date" id="in_next" oninput="sync()" title="Next Service Date">
+            <input type="date" id="in_next" oninput="sync()">
         </div>
 
         <div class="check-section">
@@ -97,162 +82,124 @@
                 <label><input type="checkbox" value="Sensor Cleaning" onchange="sync()"> Sensor Cleaning</label>
             </div>
         </div>
-
-        <textarea id="in_remarks" placeholder="Work Description / Remarks" rows="3" oninput="sync()"></textarea>
+        <textarea id="in_remarks" placeholder="Work Description" rows="3" oninput="sync()"></textarea>
 
         <div class="btn-group">
-            <button class="btn-save" onclick="saveReport()">💾 Save Report & Party</button>
-            <button class="btn-print" onclick="window.print()">🖨️ Print Report</button>
-            <button class="btn-reset" onclick="location.reload()">🔄 New Bill</button>
-            <button style="background:#f39c12;" onclick="exportToExcel()">📊 Export Excel</button>
+            <button class="btn-save" id="main_save_btn" onclick="saveReport()">💾 Save Report</button>
+            <button class="btn-update" id="main_update_btn" onclick="updateReport()">🆙 Update Changes</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Print Now</button>
+            <button style="background:#95a5a6;" onclick="location.reload()">🔄 New Bill</button>
         </div>
     </div>
 
-    <!-- 3. HISTORY -->
+    <!-- HISTORY -->
     <div class="card">
-        <h3>📂 History & Saved Parties</h3>
+        <h3>📂 History (Edit & Re-print)</h3>
         <table style="width:100%; border-collapse:collapse; font-size:13px;" id="hist_table">
-            <thead><tr style="background:#eee;"><th>No</th><th>Customer</th><th>Date</th><th>Amount</th><th>Actions</th></tr></thead>
+            <thead><tr style="background:#eee;"><th>No</th><th>Customer</th><th>Date</th><th>Total</th><th>Actions</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 </div>
 
-<!-- A4 PRINTABLE AREA -->
+<!-- A4 AREA -->
 <div id="a4-report">
     <div class="a4-header">
         <div>
-            <h1 id="out_comp" style="margin:0; font-size:28px; color:var(--primary);">COMPANY NAME</h1>
+            <h1 id="out_comp" style="margin:0; font-size:28px;">COMPANY NAME</h1>
             <p id="out_addr">Address Line</p>
             <p id="out_phone_h">📞 0000000000</p>
         </div>
         <img id="out_logo" class="logo-img" src="" alt=" ">
     </div>
-
     <div class="a4-title">SERVICE REPORT</div>
-
     <div class="info-table">
-        <div class="info-l">
-            Customer: <b id="out_name"></b><br>
-            Branch: <span id="out_branch"></span><br>
-            Contact: <span id="out_cust_phone"></span>
-        </div>
-        <div class="info-r">
-            No: <b id="out_no" style="color:red;"></b><br>
-            Date: <span id="out_date"></span>
-        </div>
+        <div class="info-l">Customer: <b id="out_name"></b><br>Branch: <span id="out_branch"></span><br>Phone: <span id="out_cust_phone"></span></div>
+        <div style="flex:1; padding:10px;">No: <b id="out_no" style="color:red;"></b><br>Date: <span id="out_date"></span></div>
     </div>
-
-    <p><b>Machine:</b> <span id="out_model"></span> &nbsp; | &nbsp; <b>Serial No:</b> <span id="out_serial"></span></p>
-
-    <div style="font-weight:bold; text-decoration:underline; font-size:14px;">NATURE OF COMPLAINT:</div>
-    <div class="comp-out" id="out_comp_list"></div>
-
+    <p><b>Machine:</b> <span id="out_model"></span> | <b>Serial:</b> <span id="out_serial"></span></p>
+    <div class="check-grid" id="out_comp_list" style="font-size:12px; margin-bottom:10px;"></div>
     <table class="work-table">
-        <thead><tr><th>Description of Work / Spare Part</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
-        <tbody>
-            <tr>
-                <td id="out_remarks" style="height:150px; vertical-align:top; white-space:pre-wrap;"></td>
-                <td id="out_qty" style="vertical-align:top;"></td>
-                <td id="out_price" style="vertical-align:top;"></td>
-                <td id="out_total" style="vertical-align:top; font-weight:bold;"></td>
-            </tr>
-        </tbody>
+        <thead><tr><th>Description</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+        <tbody><tr><td id="out_remarks" style="height:150px; vertical-align:top;"></td><td id="out_qty"></td><td id="out_price"></td><td id="out_total" style="font-weight:bold;"></td></tr></tbody>
     </table>
-    
-    <p><b>Amount in Words:</b> <span id="out_words"></span></p>
-    <p><b>Next Service Due Date:</b> <span id="out_next"></span></p>
-
+    <p><b>Words:</b> <span id="out_words"></span> | <b>Next Service:</b> <span id="out_next"></span></p>
     <img id="out_stamp" class="stamp-img" src="" alt=" ">
-
-    <div style="display:flex; justify-content:space-between; margin-top:80px;">
-        <div style="border-top:1px solid #000; width:180px; text-align:center;">Customer Sign</div>
-        <div style="border-top:1px solid #000; width:180px; text-align:center;">Authorized Sign</div>
-    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:80px;"><div style="border-top:1px solid #000; width:180px; text-align:center;">Customer Sign</div><div style="border-top:1px solid #000; width:180px; text-align:center;">Authorized Sign</div></div>
 </div>
 
 <script>
     let db = JSON.parse(localStorage.getItem('hte_master_db')) || [];
-    let parties = JSON.parse(localStorage.getItem('hte_parties')) || [];
+    let currentEditIndex = -1;
 
     window.onload = function() {
         loadBranding();
         renderHistory();
-        updatePartyDatalist();
-        let lastNo = db.length > 0 ? Math.max(...db.map(r => parseInt(r.no))) : 0;
-        document.getElementById('in_no').value = (lastNo + 1).toString().padStart(3, '0');
-        document.getElementById('out_no').innerText = document.getElementById('in_no').value;
+        generateNo();
     };
 
-    function encodeImg(input, target) {
-        const reader = new FileReader();
-        reader.onload = (e) => document.getElementById(target).src = e.target.result;
-        if(input.files[0]) reader.readAsDataURL(input.files[0]);
-    }
-
-    function saveBranding() {
-        const brand = {
-            comp: document.getElementById('set_comp').value,
-            addr: document.getElementById('set_addr').value,
-            phone: document.getElementById('set_phone').value,
-            logo: document.getElementById('out_logo').src,
-            stamp: document.getElementById('out_stamp').src
-        };
-        localStorage.setItem('hte_brand_final', JSON.stringify(brand));
-        alert("Branding Saved! Ab Report par aapka naam dikhega.");
-        loadBranding();
-    }
-
-    function loadBranding() {
-        const brand = JSON.parse(localStorage.getItem('hte_brand_final')) || {};
-        if(brand.comp) {
-            document.getElementById('out_comp').innerText = brand.comp;
-            document.getElementById('out_addr').innerText = brand.addr;
-            document.getElementById('out_phone_h').innerText = "📞 " + brand.phone;
-            document.getElementById('out_logo').src = brand.logo;
-            document.getElementById('out_stamp').src = brand.stamp;
-            document.getElementById('set_comp').value = brand.comp;
-            document.getElementById('set_addr').value = brand.addr;
-            document.getElementById('set_phone').value = brand.phone;
-        }
+    function generateNo() {
+        let lastNo = db.length > 0 ? Math.max(...db.map(r => parseInt(r.no))) : 0;
+        document.getElementById('in_no').value = (lastNo + 1).toString().padStart(3, '0');
+        sync();
     }
 
     function sync() {
-        const fields = ['name', 'branch', 'cust_phone', 'no', 'date', 'model', 'serial', 'qty', 'price', 'words', 'remarks', 'next'];
-        fields.forEach(f => {
-            let val = document.getElementById('in_'+f).value;
-            document.getElementById('out_'+f).innerText = val;
-        });
-        let total = document.getElementById('in_qty').value * document.getElementById('in_price').value;
-        document.getElementById('out_total').innerText = "₹ " + total;
-        
-        let compHtml = '';
-        document.querySelectorAll('#comp_form input').forEach(c => {
-            compHtml += `<div style="display:flex; align-items:center; gap:5px;">${c.checked ? '☑' : '☐'} ${c.value}</div>`;
-        });
-        document.getElementById('out_comp_list').innerHTML = compHtml;
+        const fields = ['name','branch','cust_phone','no','date','model','serial','qty','price','words','remarks','next'];
+        fields.forEach(f => document.getElementById('out_'+f).innerText = document.getElementById('in_'+f).value);
+        document.getElementById('out_total').innerText = "₹ " + (document.getElementById('in_qty').value * document.getElementById('in_price').value);
+        let html = '';
+        document.querySelectorAll('#comp_form input').forEach(c => html += `<div>${c.checked ? '☑' : '☐'} ${c.value}</div>`);
+        document.getElementById('out_comp_list').innerHTML = html;
         document.getElementById('a4-report').style.display = 'block';
     }
 
     function saveReport() {
-        const name = document.getElementById('in_name').value;
-        if(!name) return alert("Customer Name jaruri hai!");
+        const data = getFormData();
+        if(!data.name) return alert("Name required!");
+        db.push(data);
+        localStorage.setItem('hte_master_db', JSON.stringify(db));
+        location.reload();
+    }
+
+    function editReport(i) {
+        currentEditIndex = i;
+        const r = db[i];
+        const fields = ['no','date','name','branch','cust_phone','model','serial','qty','price','words','remarks','next'];
+        fields.forEach(f => document.getElementById('in_'+f).value = r[f]);
+        document.querySelectorAll('#comp_form input').forEach(c => c.checked = r.complaints.includes(c.value));
         
-        const report = {
+        document.getElementById('form_title').innerText = "📝 Editing Report #" + r.no;
+        document.getElementById('main_save_btn').style.display = "none";
+        document.getElementById('main_update_btn').style.display = "block";
+        sync();
+        window.scrollTo(0,0);
+    }
+
+    function updateReport() {
+        db[currentEditIndex] = getFormData();
+        localStorage.setItem('hte_master_db', JSON.stringify(db));
+        alert("Report Updated!");
+        location.reload();
+    }
+
+    function getFormData() {
+        return {
             no: document.getElementById('in_no').value,
-            name: name,
             date: document.getElementById('in_date').value,
+            name: document.getElementById('in_name').value,
+            branch: document.getElementById('in_branch').value,
+            cust_phone: document.getElementById('in_cust_phone').value,
+            model: document.getElementById('in_model').value,
+            serial: document.getElementById('in_serial').value,
+            qty: document.getElementById('in_qty').value,
+            price: document.getElementById('in_price').value,
+            words: document.getElementById('in_words').value,
+            remarks: document.getElementById('in_remarks').value,
+            next: document.getElementById('in_next').value,
+            complaints: Array.from(document.querySelectorAll('#comp_form input:checked')).map(c => c.value),
             total: document.getElementById('in_qty').value * document.getElementById('in_price').value
         };
-        db.push(report);
-        localStorage.setItem('hte_master_db', JSON.stringify(db));
-
-        if(!parties.includes(name)) {
-            parties.push(name);
-            localStorage.setItem('hte_parties', JSON.stringify(parties));
-        }
-        alert("Report aur Party save ho gayi!");
-        location.reload();
     }
 
     function renderHistory() {
@@ -260,31 +207,28 @@
         tbody.innerHTML = db.map((r, i) => `
             <tr>
                 <td>${r.no}</td><td>${r.name}</td><td>${r.date}</td><td>₹${r.total}</td>
-                <td><button style="background:red; padding:3px 8px;" onclick="deleteReport(${i})">Del</button></td>
+                <td>
+                    <button style="background:#f39c12;" onclick="editReport(${i})">✏️ Edit</button>
+                    <button style="background:#2c3e50;" onclick="printOld(${i})">🖨️ Print</button>
+                </td>
             </tr>
         `).reverse().join('');
     }
 
-    function updatePartyDatalist() {
-        const list = document.getElementById('party_list');
-        list.innerHTML = parties.map(p => `<option value="${p}">`).join('');
+    function printOld(i) {
+        editReport(i);
+        setTimeout(() => window.print(), 500);
     }
 
-    function deleteReport(i) {
-        if(confirm("Delete karein?")) {
-            db.splice(i, 1);
-            localStorage.setItem('hte_master_db', JSON.stringify(db));
-            renderHistory();
-        }
+    function encodeImg(i, t) { const r = new FileReader(); r.onload = (e) => document.getElementById(t).src = e.target.result; r.readAsDataURL(i.files[0]); }
+    function saveBranding() { 
+        const b = { comp: document.getElementById('set_comp').value, addr: document.getElementById('set_addr').value, phone: document.getElementById('set_phone').value, logo: document.getElementById('out_logo').src, stamp: document.getElementById('out_stamp').src };
+        localStorage.setItem('hte_brand_final', JSON.stringify(b)); location.reload(); 
     }
-
-    function exportToExcel() {
-        const ws = XLSX.utils.json_to_sheet(db);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Reports");
-        XLSX.writeFile(wb, "HI-TECH_Service_History.xlsx");
+    function loadBranding() {
+        const b = JSON.parse(localStorage.getItem('hte_brand_final')) || {};
+        if(b.comp) { document.getElementById('out_comp').innerText = b.comp; document.getElementById('out_addr').innerText = b.addr; document.getElementById('out_phone_h').innerText = "📞 "+b.phone; document.getElementById('out_logo').src = b.logo; document.getElementById('out_stamp').src = b.stamp; document.getElementById('set_comp').value = b.comp; document.getElementById('set_addr').value = b.addr; document.getElementById('set_phone').value = b.phone; }
     }
 </script>
-
 </body>
 </html>
