@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>HI-TECH Service Software Pro</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; }
+        body { font-family: 'Segoe UI', Arial; background: #f0f2f5; margin: 0; padding: 20px; }
+        .no-print { max-width: 1000px; margin: auto; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 5px solid var(--primary); }
+        .admin-box { background: #eef7ff; border: 2px solid var(--accent); }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 10px; }
+        input, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%; box-sizing: border-box; }
+        .btn-save { background: #27ae60; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* A4 Layout Branding */
+        #a4-report { width: 210mm; min-height: 297mm; padding: 15mm; background: white; margin: 20px auto; border: 1px solid #000; box-sizing: border-box; position: relative; }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; align-items: center; }
+        .logo-preview { max-height: 80px; max-width: 150px; object-fit: contain; }
+        .stamp-preview { position: absolute; bottom: 100px; right: 60px; width: 130px; opacity: 0.7; pointer-events: none; }
+        .a4-title { text-align: center; font-weight: bold; font-size: 22px; border: 1px solid #000; margin: 15px 0; padding: 5px; background: #f9f9f9; }
+        
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        .out-comp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; font-size: 12px; margin: 10px 0; }
+
+        @media print {
+            .no-print { display: none !important; }
+            #a4-report { border: none; margin: 0; padding: 10mm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="no-print">
+    <!-- BRANDING SETTINGS -->
+    <div class="card admin-box">
+        <h3>🏢 Branding Setup (Company Name & Logo)</h3>
+        <div class="grid-3">
+            <input type="text" id="set_comp" placeholder="Company Name">
+            <input type="text" id="set_addr" placeholder="Address">
+            <input type="text" id="set_phone" placeholder="Phone Number">
+            <div>Logo: <input type="file" onchange="loadImg(this, 'out_logo')"></div>
+            <div>Stamp: <input type="file" onchange="loadImg(this, 'out_stamp')"></div>
+            <button class="btn-save" onclick="saveBranding()">✅ Save Branding</button>
+        </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <div class="card">
+        <h2>🛠️ Service Report Entry</h2>
+        <div class="grid-3">
+            <input type="text" id="in_name" placeholder="Customer Name" oninput="sync()">
+            <input type="text" id="in_branch" placeholder="Branch" oninput="sync()">
+            <input type="text" id="in_cust_phone" placeholder="Phone" oninput="sync()">
+            <input type="text" id="in_no" readonly style="background:#eee; color:red; font-weight:bold;">
+            <input type="date" id="in_date" oninput="sync()">
+            <input type="text" id="in_model" placeholder="Machine Model" oninput="sync()">
+            <input type="text" id="in_serial" placeholder="Serial No" oninput="sync()">
+            <input type="number" id="in_amount" placeholder="Total Amount (₹)" oninput="sync()">
+        </div>
+
+        <div style="background:#f9f9f9; padding:10px; margin:10px 0; border:1px dashed #ccc;">
+            <b>Complaint Nature:</b>
+            <div class="grid-3" id="in_checks" style="font-size:12px; margin-top:5px;">
+                <label><input type="checkbox" value="Not Turning On" onchange="sync()"> Not Turning On</label>
+                <label><input type="checkbox" value="Error Message" onchange="sync()"> Error Message</label>
+                <label><input type="checkbox" value="Note Jamming" onchange="sync()"> Note Jamming</label>
+                <label><input type="checkbox" value="Fake Detection" onchange="sync()"> Fake Detection</label>
+                <label><input type="checkbox" value="Calibration Error" onchange="sync()"> Calibration Error</label>
+                <label><input type="checkbox" value="Sensor Cleaning" onchange="sync()"> Sensor Cleaning</label>
+            </div>
+        </div>
+
+        <!-- DESCRIPTION FIELD (The Missing One) -->
+        <div style="margin-top:10px;">
+            <b>Description of Work / Spare Parts:</b>
+            <textarea id="in_desc" placeholder="Write work details here..." rows="4" oninput="sync()"></textarea>
+        </div>
+
+        <div class="btn-group" style="margin-top:20px; display:flex; gap:10px;">
+            <button style="background:var(--primary); color:white; padding:12px; border-radius:5px; border:none; cursor:pointer; font-weight:bold;" onclick="window.print()">🖨️ Print Report</button>
+            <button style="background:#95a5a6; color:white; padding:12px; border-radius:5px; border:none; cursor:pointer;" onclick="location.reload()">🔄 New Bill</button>
+        </div>
+    </div>
+</div>
+
+<!-- A4 Page -->
+<div id="a4-report">
+    <div class="header">
+        <div>
+            <h1 id="out_comp" style="margin:0; font-size:28px;">COMPANY NAME</h1>
+            <p id="out_addr">Business Address Line</p>
+            <p id="out_phone_head">📞 0000000000</p>
+        </div>
+        <img id="out_logo" class="logo-preview" src="" alt="">
+    </div>
+
+    <div class="a4-title">SERVICE REPORT</div>
+
+    <div style="border: 1px solid #000; display: flex; margin-bottom: 15px;">
+        <div style="flex: 2; padding: 10px; border-right: 1px solid #000; line-height: 1.8;">
+            Customer: <b id="out_name"></b><br>Branch: <span id="out_branch"></span><br>Phone: <span id="out_cust_phone"></span>
+        </div>
+        <div style="flex: 1; padding: 10px;">No: <b id="out_no" style="color:red;"></b><br>Date: <span id="out_date"></span></div>
+    </div>
+
+    <p><b>Machine:</b> <span id="out_model"></span> | <b>Serial:</b> <span id="out_serial"></span></p>
+    <div id="out_checks" class="out-comp-grid"></div>
+
+    <!-- WORK DESCRIPTION TABLE -->
+    <table>
+        <tr>
+            <th width="80%">Description of Work / Spare Part</th>
+            <th width="20%">Price (₹)</th>
+        </tr>
+        <tr>
+            <td id="out_desc" style="height:200px; vertical-align:top; white-space: pre-wrap;"></td>
+            <td id="out_amount" style="font-weight:bold; vertical-align:top;"></td>
+        </tr>
+        <tr>
+            <td align="right"><b>TOTAL AMOUNT</b></td>
+            <td id="out_total_final" style="font-weight:bold;"></td>
+        </tr>
+    </table>
+
+    <img id="out_stamp" class="stamp-preview" src="" alt="">
+
+    <div style="display:flex; justify-content:space-between; margin-top:80px;">
+        <div style="border-top:1px solid #000; width:180px; text-align:center;">Customer Sign</div>
+        <div style="border-top:1px solid #000; width:180px; text-align:center;">Authorized Sign</div>
+    </div>
+</div>
+
+<script>
+    function loadBranding() {
+        const brand = JSON.parse(localStorage.getItem('hte_brand_v3')) || {};
+        if(brand.comp) {
+            document.getElementById('out_comp').innerText = brand.comp;
+            document.getElementById('out_addr').innerText = brand.addr;
+            document.getElementById('out_phone_head').innerText = "📞 " + brand.phone;
+            document.getElementById('out_logo').src = brand.logo || '';
+            document.getElementById('out_stamp').src = brand.stamp || '';
+            document.getElementById('set_comp').value = brand.comp;
+            document.getElementById('set_addr').value = brand.addr;
+            document.getElementById('set_phone').value = brand.phone;
+        }
+    }
+
+    function saveBranding() {
+        const brand = {
+            comp: document.getElementById('set_comp').value,
+            addr: document.getElementById('set_addr').value,
+            phone: document.getElementById('set_phone').value,
+            logo: document.getElementById('out_logo').src,
+            stamp: document.getElementById('out_stamp').src
+        };
+        localStorage.setItem('hte_brand_v3', JSON.stringify(brand));
+        alert("Branding Updated Successfully!");
+        loadBranding();
+    }
+
+    function loadImg(input, target) {
+        const reader = new FileReader();
+        reader.onload = (e) => document.getElementById(target).src = e.target.result;
+        reader.readAsDataURL(input.files);
+    }
+
+    function sync() {
+        const fields = ['name', 'branch', 'cust_phone', 'date', 'model', 'serial', 'amount', 'desc'];
+        fields.forEach(f => {
+            let val = document.getElementById('in_' + f).value;
+            document.getElementById('out_' + f).innerText = val;
+            if(f === 'amount') document.getElementById('out_total_final').innerText = "₹ " + val;
+        });
+
+        let html = '';
+        document.querySelectorAll('#in_checks input').forEach(c => {
+            html += `<div>${c.checked ? '☑' : '☐'} ${c.value}</div>`;
+        });
+        document.getElementById('out_checks').innerHTML = html;
+    }
+
+    window.onload = function() {
+        loadBranding();
+        let lastNo = localStorage.getItem('hte_last_no_v3') || 0;
+        document.getElementById('in_no').value = (parseInt(lastNo)+1).toString().padStart(3,'0');
+        document.getElementById('out_no').innerText = document.getElementById('in_no').value;
+    };
+</script>
+
+</body>
+</html>
